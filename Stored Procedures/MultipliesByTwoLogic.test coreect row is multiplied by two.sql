@@ -3,27 +3,35 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE PROCEDURE [MultipliesByTwoLogic].[test coreect row is multiplied by two]
+CREATE PROCEDURE [MultipliesByTwoLogic].[Test_CorrectRowIsMultipliedByTwo]
 AS
 BEGIN
-	EXEC tSQLt.FakeTable 'dbo', 'Stuff';
-	INSERT INTO dbo.[Stuff] (Id, StuffNumber) VALUES (1, 2);
-	INSERT INTO dbo.[Stuff] (Id, StuffNumber) VALUES (2, 3);
-	INSERT INTO dbo.[Stuff] (Id, StuffNumber) VALUES (3, 4);
+    -- Set up a fake version of the 'Stuff' table using tSQLt
+    EXEC tSQLt.FakeTable 'dbo', 'Stuff';
 
-	CREATE TABLE #Actual (
+    -- Insert test data into the fake 'Stuff' table
+    INSERT INTO dbo.Stuff (Id, StuffNumber) VALUES (1, 2);
+    INSERT INTO dbo.Stuff (Id, StuffNumber) VALUES (2, 3);
+    INSERT INTO dbo.Stuff (Id, StuffNumber) VALUES (3, 4);
+
+    -- Create a temporary table to store the actual result
+    CREATE TABLE #Actual (
         StuffNumber INT
     );
 
-	INSERT #Actual EXEC dbo.MultipliesByTwo '2'
+    -- Execute the procedure and store the result in the #Actual table
+    INSERT INTO #Actual
+    EXEC dbo.MultipliesByTwo '2';
 
-	CREATE TABLE #Expected (
+    -- Create a temporary table to store the expected result
+    CREATE TABLE #Expected (
         StuffNumber INT
     );
 
-	INSERT INTO #Expected (StuffNumber) VALUES (3*2);
+    -- Insert the expected value (3 * 2) into the #Expected table
+    INSERT INTO #Expected (StuffNumber) VALUES (3 * 2);
 
-	EXEC tSQLt.AssertEqualsTable '#Expected', '#Actual';
-
+    -- Compare the #Actual and #Expected tables using tSQLt
+    EXEC tSQLt.AssertEqualsTable '#Expected', '#Actual';
 END;
 GO
